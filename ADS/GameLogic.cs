@@ -1,24 +1,16 @@
-﻿// GameLogic.cs
-using System;
+﻿using System;
 using System.Collections;
 using System.Threading;
+using Game;
 
 namespace game
 {
     public class GameLogic
     {
-        private Queue orders;
-        private Stack dishes;
-        private int palletCount;
-        private int score;
-
-        public GameLogic()
-        {
-            orders = new Queue();
-            dishes = new Stack();
-            palletCount = 0;
-            score = 0;
-        }
+        private readonly Queue orders = new Queue();
+        private readonly Stack dishes = new Stack();
+        private int palletCount, score, g, k, p;
+        private readonly string[] meal = { "Pizza", "Pasta", "Salad" };
 
         public void StartGame()
         {
@@ -28,80 +20,70 @@ namespace game
                 g++;
 
                 Console.Clear();
-                Console.WriteLine("                                       score:" + score + "          " + dishes.Count + "  ________");
-                Console.WriteLine("_______________________________________________________________________");
-                Console.WriteLine("|To Close and re-open restaurant press ESC                            |");
-                Console.WriteLine("|To Start game again press Q                                          |");
-                Console.WriteLine("|To make and serve pizza press P or M or C                            |");
-                Console.WriteLine("|To clean your dishes press SPACEBAR                                  |");
-                Console.WriteLine("|To exit the game press W                                             |");
-                Console.WriteLine("|____________________________________________________________________ |");
+                PrintUI();
+                ProcessClientOrder(mIndex);
+                PrintOrders();
 
-                orders.Enqueue(meal[mIndex] + "O" + g + "  ");
+                if (orders.Count == 7 || palletCount == 10)
+                    HandleGameOver();
 
-                foreach (Object obj in orders)
-                {
-                    Console.Write(obj);
-                    k++;
-                }
-                Console.WriteLine("");
-                Console.WriteLine("______________________________________________________________________");
-                Console.WriteLine("|       |Take order|         ____________        |           |       |");
-                Console.WriteLine("|              O            | Pizza oven |       |           |       |");
-                Console.WriteLine("|                           |____________|               O           |");
-                Console.WriteLine("|                              O       O                             |");
-                Console.WriteLine("|____________________________________________________________________|");
-                Console.WriteLine("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
-                Console.WriteLine("                                                     |__DISHWASHER__|");
-                PrintDishes();
-                Console.WriteLine("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
-
-                if (orders.Count == 7)
-                {
-                    orders.Clear();
-                    GameOver();
-                }
-
-                Thread.Sleep(2000);
-                if (palletCount == 10)
-                {
-                    ClearDishes();
-                    GameOver();
-                }
-
-                while (Console.KeyAvailable)
-                {
-                    ConsoleKeyInfo cki = Console.ReadKey(true);
-                    if (cki.Key == ConsoleKey.Spacebar)
-                    {
-                        ClearDishes();
-                    }
-                    if (cki.Key == ConsoleKey.C || cki.Key == ConsoleKey.P || cki.Key == ConsoleKey.V || cki.Key == ConsoleKey.M)
-                    {
-                        ServePizza(cki.Key.ToString());
-                    }
-                    if (cki.Key == ConsoleKey.Escape)
-                    {
-                        Meniu();
-                    }
-                    if (cki.Key == ConsoleKey.Q)
-                    {
-                        StartGame();
-                    }
-                    if (cki.Key == ConsoleKey.W)
-                    {
-                        Environment.Exit(0);
-                    }
-                }
+                ProcessKeyPress();
             }
         }
 
-        private void PrintDishes()
+        private void PrintUI()
         {
-            foreach (Object obj in dishes)
+            Console.WriteLine($"                                       score: {score}          {dishes.Count}  ________\n" +
+                              "_______________________________________________________________________\n" +
+                              "|To Close and re-open restaurant press ESC                            |\n" +
+                              "|To Start game again press Q                                          |\n" +
+                              "|To make and serve pizza press P or M or C                            |\n" +
+                              "|To clean your dishes press SPACEBAR                                  |\n" +
+                              "|To exit the game press W                                             |\n" +
+                              "|____________________________________________________________________ |\n" +
+                              "______________________________________________________________________\n" +
+                              "|       |Take order|         ____________        |           |       |\n" +
+                              "|              O            | Pizza oven |       |           |       |\n" +
+                              "|                           |____________|               O           |\n" +
+                              "|                              O       O                             |\n" +
+                              "|____________________________________________________________________|\n" +
+                              "~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~\n" +
+                              "                                                     |__DISHWASHER__|\n" +
+                              "~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~");
+        }
+
+        private void ProcessClientOrder(int mIndex)
+        {
+            orders.Enqueue($"{meal[mIndex]}O{g}  ");
+            Thread.Sleep(2000);
+        }
+
+        private void PrintOrders()
+        {
+            foreach (var obj in orders)
             {
                 Console.Write(obj);
-                p++;
+                k++;
+            }
+            Console.WriteLine("\n______________________________________________________________________");
+        }
+
+        private void ProcessKeyPress()
+        {
+            while (Console.KeyAvailable)
+            {
+                ConsoleKeyInfo cki = Console.ReadKey(true);
+                switch (cki.Key)
+                {
+                    case ConsoleKey.Spacebar: ClearDishes(); break;
+                    case ConsoleKey.C:
+                    case ConsoleKey.P:
+                    case ConsoleKey.V:
+                    case ConsoleKey.M: ServePizza(cki.Key.ToString()); break;
+                    case ConsoleKey.Escape: Program.PrintMenuOptions(); break;
+                    case ConsoleKey.Q: StartGame(); break;
+                    case ConsoleKey.W: Environment.Exit(0); break;
+                }
             }
         }
 
@@ -119,15 +101,11 @@ namespace game
             score += 20;
         }
 
-        private void GameOver()
+        private void HandleGameOver()
         {
             Console.Clear();
-            Console.WriteLine("");
-            Console.WriteLine("");
-            Console.WriteLine("");
-            Console.WriteLine("");
-            Console.WriteLine("                                Game Over");
-            Console.WriteLine("                       Final score: " + score);
+            Console.WriteLine("\n\n\n\n\n                                Game Over" +
+                              $"\n                       Final score: {score}");
             Console.ReadLine();
             Environment.Exit(0);
         }
@@ -135,53 +113,23 @@ namespace game
         public static void Rules()
         {
             Console.Clear();
-            Console.WriteLine("");
-            Console.WriteLine("");
-            Console.WriteLine("");
-            Console.WriteLine("     -----------------------------------------------------------");
-            Console.WriteLine("     |1.You can start your game again as many times as you want  |");
-            Console.WriteLine("     |---------------------------------------------------------- |");
-            Console.WriteLine("     |2.You can close your restaurant and re-open restaurant     |");
-            Console.WriteLine("     |-----------------------------------------------------------|");
-            Console.WriteLine("     |3.You have to make a pizza and then serve it to a client   |");
-            Console.WriteLine("     |-----------------------------------------------------------|");
-            Console.WriteLine("     | Max 6 clients if you cant take care of them you will lose |");
-            Console.WriteLine("     |-----------------------------------------------------------|");
-            Console.WriteLine("     |4.You must clear your pallet place                         |");
-            Console.WriteLine("     |-----------------------------------------------------------|");
-            Console.WriteLine("     |Max 10 pallets if you cant clear your place you will lose  |");
-            Console.WriteLine("     |-----------------------------------------------------------|");
-            Console.WriteLine("     |5.You can exit the game                                    |");
-            Console.WriteLine("     -------------------------------------------------------------");
-            Console.WriteLine("     Press Enter to return to main menu");
-            if (Console.ReadLine() is "")
-            {
-                return;
-            }
-        }
-        public static void Controls()
-        {
-            Console.Clear();
-            Console.WriteLine("");
-            Console.WriteLine("");
-            Console.WriteLine("");
-            Console.WriteLine("    -------------------------------------------------------------");
-            Console.WriteLine("    |1. Start game again (Q)                                    |");
-            Console.WriteLine("    |---------------------------------------------------------- |");
-            Console.WriteLine("    |2. Close your restaurant (ESC) Re-open restaurant (ESC)    |");
-            Console.WriteLine("    |-----------------------------------------------------------|");
-            Console.WriteLine("    |3. Make pizza and serve pizza                              |");
-            Console.WriteLine("    |(Peperoni - P, Chesse - C, Margherita - M, Pancetta - P)   |");
-            Console.WriteLine("    |-----------------------------------------------------------|");
-            Console.WriteLine("    |4. Clear your pallet place (Spacebar)                      |");
-            Console.WriteLine("    |-----------------------------------------------------------|");
-            Console.WriteLine("    |5. Exit the game (W)                                       |");
-            Console.WriteLine("    -------------------------------------------------------------");
-            Console.WriteLine("    Press Enter to return to main menu");
-            if (Console.ReadLine() is "")
-            {
-                return;
-            }
+            Console.WriteLine("\n\n\n\n     -----------------------------------------------------------" +
+                              "\n     |1.You can start your game again as many times as you want  |" +
+                              "\n     |---------------------------------------------------------- |" +
+                              "\n     |2.You can close your restaurant and re-open restaurant     |" +
+                              "\n     |-----------------------------------------------------------|" +
+                              "\n     |3.You have to make a pizza and then serve it to a client   |" +
+                              "\n     |-----------------------------------------------------------|" +
+                              "\n     | Max 6 clients if you cant take care of them you will lose |" +
+                              "\n     |-----------------------------------------------------------|" +
+                              "\n     |4.You must clear your pallet place                         |" +
+                              "\n     |-----------------------------------------------------------|" +
+                              "\n     |Max 10 pallets if you cant clear your place you will lose  |" +
+                              "\n     |-----------------------------------------------------------|" +
+                              "\n     |5.You can exit the game                                    |" +
+                              "\n     -------------------------------------------------------------" +
+                              "\n     Press Enter to return to the main menu");
+            if (Console.ReadLine() == "") return;
         }
     }
 }

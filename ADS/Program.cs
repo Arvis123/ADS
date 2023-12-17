@@ -1,7 +1,7 @@
-﻿// Program.cs
+﻿using game;
 using System;
 
-namespace game
+namespace Game
 {
     class Program
     {
@@ -9,33 +9,47 @@ namespace game
         {
             Console.SetWindowSize(70, 29);
 
-            bool showMenu = true;
-            while (showMenu)
-            {
-                showMenu = MainMenu();
-            }
+            while (ShowMainMenu()) { }
         }
 
-        private static bool MainMenu()
+        private static bool ShowMainMenu()
         {
             Console.Clear();
-            Console.WriteLine("");
-            Console.WriteLine("");
-            Console.WriteLine("                          La pizza ristorante!");
+            PrintWelcomeMessage();
+            PrintMenuOptions();
+
+            string userInput = GetUserInput();
+            return ProcessUserInput(userInput);
+        }
+
+        private static void PrintWelcomeMessage()
+        {
+            Console.WriteLine("\n\n                          La pizza ristorante!");
             Console.WriteLine("                   Welcome to an Italian restaurant");
             Console.WriteLine("             Here we are serving pizzas for our customers");
-            Console.WriteLine("     -----------------------------------------------------------");
-            Console.WriteLine("     If you want to start a day being our new chef type number 1");
-            Console.WriteLine("     -----------------------------------------------------------");
-            Console.WriteLine("     If you want to read game rules type number 2 (better do it)");
-            Console.WriteLine("     -----------------------------------------------------------");
-            Console.WriteLine("     Fist time user have to read game controls type 3 to read it");
-            Console.WriteLine("     -----------------------------------------------------------");
-            Console.WriteLine("           If you want to exit right now just type number 4      ");
-            Console.WriteLine("     -----------------------------------------------------------");
-            Console.Write("\r\n                          Select an option: ");
+        }
 
-            switch (Console.ReadLine())
+        public static void PrintMenuOptions()
+        {
+            Console.WriteLine("     -----------------------------------------------------------");
+            Console.WriteLine("     1. Start a day as a new chef");
+            Console.WriteLine("     -----------------------------------------------------------");
+            Console.WriteLine("     2. Read game rules (better do it)");
+            Console.WriteLine("     -----------------------------------------------------------");
+            Console.WriteLine("     3. Read game controls for first-time users");
+            Console.WriteLine("     -----------------------------------------------------------");
+            Console.WriteLine("     4. Exit");
+            Console.Write("\r\n                          Select an option: ");
+        }
+
+        private static string GetUserInput()
+        {
+            return Console.ReadLine();
+        }
+
+        private static bool ProcessUserInput(string userInput)
+        {
+            switch (userInput)
             {
                 case "1":
                     new GameLogic().StartGame();
@@ -44,13 +58,19 @@ namespace game
                     GameLogic.Rules();
                     return true;
                 case "3":
-                    GameLogic.Controls();
+                    GameLogic.Rules();
                     return true;
                 case "4":
                     return false;
                 default:
+                    DisplayInvalidOptionMessage();
                     return true;
             }
+        }
+
+        private static void DisplayInvalidOptionMessage()
+        {
+            Console.WriteLine("Invalid option. Please try again.");
         }
     }
 }
