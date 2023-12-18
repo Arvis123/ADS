@@ -8,11 +8,6 @@ namespace game
 {
     public class Program
     {
-        public static void ClearConsole()
-        {
-            Console.Clear();
-        }
-
         public static void Main(string[] args)
         {
             Console.SetWindowSize(70, 29);
@@ -47,6 +42,11 @@ namespace game
                 Console.WriteLine();
             }
         }
+        public static void ClearConsole(TextWriter writer)
+        {
+            writer.Write("\x1B[2J");
+            writer.Flush();
+        }
 
         public static bool MainMenu(TextReader reader, TextWriter writer)
         {
@@ -60,7 +60,7 @@ namespace game
             writer.WriteLine("     -----------------------------------------------------------");
             writer.WriteLine("     If you want to read game rules type number 2 (better do it)");
             writer.WriteLine("     -----------------------------------------------------------");
-            writer.WriteLine("     Fist time user have to read game controls type 3 to read it");
+            writer.WriteLine("     First time user have to read game controls type 3 to read it");
             writer.WriteLine("     -----------------------------------------------------------");
             writer.WriteLine("           If you want to exit right now just type number 4      ");
             writer.WriteLine("     -----------------------------------------------------------");
@@ -88,7 +88,7 @@ namespace game
         {
             ClearConsole(writer);
 
-            ClearConsole();
+            ClearConsole(writer);
             writer.WriteLine("");
             writer.WriteLine("");
             writer.WriteLine("");
@@ -114,34 +114,28 @@ namespace game
             }
         }
 
-        public static void ClearConsole(TextWriter writer)
-        {
-            if (Console.Out == writer)
-            {
-                Console.Clear();
-            }
-        }
+        
 
         public static void Controls(TextWriter writer)
         {
             ClearConsole(writer);
 
-            Console.WriteLine("");
-            Console.WriteLine("");
-            Console.WriteLine("");
-            Console.WriteLine("    -------------------------------------------------------------");
-            Console.WriteLine("    |1. Start game again (Q)                                    |");
-            Console.WriteLine("    |---------------------------------------------------------- |");
-            Console.WriteLine("    |2. Close your restaurant (ESC) Re-open restaurant (ESC)    |");
-            Console.WriteLine("    |-----------------------------------------------------------|");
-            Console.WriteLine("    |3. Make pizza and serve pizza                              |");
-            Console.WriteLine("    |(Peperoni - P, Chesse - C, Margherita - M, Pancetta - P)   |");
-            Console.WriteLine("    |-----------------------------------------------------------|");
-            Console.WriteLine("    |4. Clear your pallet place (Spacebar)                      |");
-            Console.WriteLine("    |-----------------------------------------------------------|");
-            Console.WriteLine("    |5. Exit the game (W)                                       |");
-            Console.WriteLine("    -------------------------------------------------------------");
-            Console.WriteLine("    Press Enter to return to main menu");
+            writer.WriteLine("");
+            writer.WriteLine("");
+            writer.WriteLine("");
+            writer.WriteLine("    -------------------------------------------------------------");
+            writer.WriteLine("    |1. Start game again (Q)                                    |");
+            writer.WriteLine("    |---------------------------------------------------------- |");
+            writer.WriteLine("    |2. Close your restaurant (ESC) Re-open restaurant (ESC)    |");
+            writer.WriteLine("    |-----------------------------------------------------------|");
+            writer.WriteLine("    |3. Make pizza and serve pizza                              |");
+            writer.WriteLine("    |(Peperoni - P, Chesse - C, Margherita - M, Pancetta - P)   |");
+            writer.WriteLine("    |-----------------------------------------------------------|");
+            writer.WriteLine("    |4. Clear your pallet place (Spacebar)                      |");
+            writer.WriteLine("    |-----------------------------------------------------------|");
+            writer.WriteLine("    |5. Exit the game (W)                                       |");
+            writer.WriteLine("    -------------------------------------------------------------");
+            writer.WriteLine("    Press Enter to return to main menu");
             if (Console.ReadLine() is "")
             {
                 return;
@@ -172,7 +166,7 @@ namespace game
                 int mIndex = rnd.Next(meal.Length);
                 g++;
 
-                ClearConsole();
+                ClearConsole(writer);
                 writer.WriteLine("                                       score:" + score + "          " + s.Count + "  ________");
                 writer.WriteLine("_______________________________________________________________________");
                 writer.WriteLine("|To Close and re-open restaurant press ESC                            |");
@@ -204,7 +198,7 @@ namespace game
                 if (q.Count == 7)
                 {
                     q.Clear();
-                    ClearConsole();
+                    ClearConsole(writer);
                     writer.WriteLine("");
                     writer.WriteLine("");
                     writer.WriteLine("");
@@ -220,7 +214,7 @@ namespace game
                 if (p == 10)
                 {
                     s.Clear();
-                    ClearConsole();
+                    ClearConsole(writer);
                     writer.WriteLine("");
                     writer.WriteLine("");
                     writer.WriteLine("");
@@ -286,7 +280,7 @@ namespace game
 
 
             s.Clear();
-            ClearConsole();
+            ClearConsole(writer);
             writer.WriteLine("");
             writer.WriteLine("");
             writer.WriteLine("");
@@ -299,7 +293,7 @@ namespace game
         }
         public static bool Meniu(TextWriter writer)
         {
-            ClearConsole();
+            ClearConsole(writer);
             writer.WriteLine("You closed your restaurant select what you are gonna do next");
             writer.WriteLine("1. Re-open restaurant");
 
